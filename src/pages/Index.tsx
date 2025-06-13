@@ -1,9 +1,8 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Shield, MessageCircle, FileText, Users, Newspaper, Scale, Blockchain, Bot, Upload, Mic } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Shield, MessageCircle, FileText, Users, Newspaper, Scale, Link, Bot, Upload, Mic } from "lucide-react";
+import { Link as RouterLink } from "react-router-dom";
 
 const Index = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -22,27 +21,27 @@ const Index = () => {
           <div className="flex space-x-4">
             {!isLoggedIn ? (
               <>
-                <Link to="/login">
+                <RouterLink to="/login">
                   <Button variant="outline" className="hover:bg-emerald-50">Login</Button>
-                </Link>
-                <Link to="/signup">
+                </RouterLink>
+                <RouterLink to="/signup">
                   <Button className="bg-emerald-600 hover:bg-emerald-700">Sign Up</Button>
-                </Link>
+                </RouterLink>
               </>
             ) : (
               <div className="flex space-x-4">
-                <Link to="/chat">
+                <RouterLink to="/chat">
                   <Button variant="outline">Chatbot</Button>
-                </Link>
-                <Link to="/documents">
+                </RouterLink>
+                <RouterLink to="/documents">
                   <Button variant="outline">Documents</Button>
-                </Link>
-                <Link to="/lawyers">
+                </RouterLink>
+                <RouterLink to="/lawyers">
                   <Button variant="outline">Find Lawyers</Button>
-                </Link>
-                <Link to="/news">
+                </RouterLink>
+                <RouterLink to="/news">
                   <Button variant="outline">Legal News</Button>
-                </Link>
+                </RouterLink>
               </div>
             )}
           </div>
@@ -60,16 +59,16 @@ const Index = () => {
             and access authentic legal news - all powered by AI tailored for Pakistani law.
           </p>
           <div className="flex justify-center space-x-4">
-            <Link to="/signup">
+            <RouterLink to="/signup">
               <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-lg px-8 hover:scale-105 transition-transform">
                 Get Started Free
               </Button>
-            </Link>
-            <Link to="/chat">
+            </RouterLink>
+            <RouterLink to="/chat">
               <Button size="lg" variant="outline" className="text-lg px-8 hover:scale-105 transition-transform">
                 Try AI Assistant
               </Button>
-            </Link>
+            </RouterLink>
           </div>
         </div>
       </section>
@@ -110,7 +109,7 @@ const Index = () => {
                 Store your legal documents securely with blockchain encryption technology
               </p>
               <div className="text-sm text-amber-600 flex items-center justify-center">
-                <Blockchain className="h-4 w-4 mr-1" />
+                <Link className="h-4 w-4 mr-1" />
                 <span>Blockchain Secured</span>
               </div>
             </CardContent>

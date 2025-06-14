@@ -1,22 +1,46 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Shield, MessageCircle, FileText, Users, Newspaper, Scale, Link, Bot, Upload, Mic } from "lucide-react";
-import { Link as RouterLink } from "react-router-dom";
+import { Shield, MessageCircle, FileText, Users, Newspaper, Scale, Link, Bot, Upload, Mic, LogOut, ArrowLeft } from "lucide-react";
+import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
 
 const Index = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    navigate('/');
+  };
+
+  const handleGoBack = () => {
+    navigate(-1);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50">
       {/* Navigation */}
       <nav className="bg-white/90 backdrop-blur-md border-b border-emerald-100 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <Scale className="h-8 w-8 text-emerald-600" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-amber-600 bg-clip-text text-transparent">
-              Wakalat-GPT
-            </span>
+          <div className="flex items-center space-x-4">
+            {location.pathname !== '/' && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleGoBack}
+                className="hover:bg-emerald-50"
+              >
+                <ArrowLeft className="h-4 w-4 mr-1" />
+                Back
+              </Button>
+            )}
+            <div className="flex items-center space-x-2">
+              <Scale className="h-8 w-8 text-emerald-600" />
+              <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-amber-600 bg-clip-text text-transparent">
+                Wakalat-GPT
+              </span>
+            </div>
           </div>
           <div className="flex space-x-4">
             {!isLoggedIn ? (
@@ -42,6 +66,14 @@ const Index = () => {
                 <RouterLink to="/news">
                   <Button variant="outline">Legal News</Button>
                 </RouterLink>
+                <Button 
+                  variant="outline" 
+                  onClick={handleLogout}
+                  className="hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                >
+                  <LogOut className="h-4 w-4 mr-1" />
+                  Logout
+                </Button>
               </div>
             )}
           </div>
@@ -190,11 +222,11 @@ const Index = () => {
           <p className="text-xl mb-8 opacity-90">
             Join thousands of Pakistanis who trust Wakalat-GPT for their legal needs
           </p>
-          <Link to="/signup">
+          <RouterLink to="/signup">
             <Button size="lg" className="bg-white text-emerald-600 hover:bg-gray-100 text-lg px-8 hover:scale-105 transition-transform">
               Start Your Legal Journey
             </Button>
-          </Link>
+          </RouterLink>
         </div>
       </section>
 

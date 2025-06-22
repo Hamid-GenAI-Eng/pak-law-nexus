@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,6 +19,14 @@ const Index = () => {
     navigate(-1);
   };
 
+  const handleProtectedNavigation = (path: string) => {
+    if (!isLoggedIn) {
+      navigate('/login');
+    } else {
+      navigate(path);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50">
       {/* Navigation */}
@@ -35,12 +44,12 @@ const Index = () => {
                 Back
               </Button>
             )}
-            <div className="flex items-center space-x-2">
+            <RouterLink to="/" className="flex items-center space-x-2">
               <Scale className="h-8 w-8 text-emerald-600" />
               <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-amber-600 bg-clip-text text-transparent">
                 Wakalat-GPT
               </span>
-            </div>
+            </RouterLink>
           </div>
           <div className="flex space-x-4">
             {!isLoggedIn ? (
@@ -54,18 +63,38 @@ const Index = () => {
               </>
             ) : (
               <div className="flex space-x-4">
-                <RouterLink to="/chat">
-                  <Button variant="outline">Chatbot</Button>
-                </RouterLink>
-                <RouterLink to="/documents">
-                  <Button variant="outline">Documents</Button>
-                </RouterLink>
-                <RouterLink to="/lawyers">
-                  <Button variant="outline">Find Lawyers</Button>
-                </RouterLink>
-                <RouterLink to="/news">
-                  <Button variant="outline">Legal News</Button>
-                </RouterLink>
+                <Button 
+                  variant="outline" 
+                  onClick={() => handleProtectedNavigation('/chat')}
+                  className="hover:bg-emerald-50"
+                >
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  Chatbot
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => handleProtectedNavigation('/documents')}
+                  className="hover:bg-emerald-50"
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Documents
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => handleProtectedNavigation('/lawyers')}
+                  className="hover:bg-emerald-50"
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Find Lawyers
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => handleProtectedNavigation('/news')}
+                  className="hover:bg-emerald-50"
+                >
+                  <Newspaper className="h-4 w-4 mr-2" />
+                  Legal News
+                </Button>
                 <Button 
                   variant="outline" 
                   onClick={handleLogout}
@@ -91,16 +120,32 @@ const Index = () => {
             and access authentic legal news - all powered by AI tailored for Pakistani law.
           </p>
           <div className="flex justify-center space-x-4">
-            <RouterLink to="/signup">
-              <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-lg px-8 hover:scale-105 transition-transform">
-                Get Started Free
+            {!isLoggedIn ? (
+              <>
+                <RouterLink to="/signup">
+                  <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-lg px-8 hover:scale-105 transition-transform">
+                    Get Started Free
+                  </Button>
+                </RouterLink>
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="text-lg px-8 hover:scale-105 transition-transform"
+                  onClick={() => navigate('/login')}
+                >
+                  Try AI Assistant
+                </Button>
+              </>
+            ) : (
+              <Button 
+                size="lg" 
+                className="bg-emerald-600 hover:bg-emerald-700 text-lg px-8 hover:scale-105 transition-transform"
+                onClick={() => handleProtectedNavigation('/chat')}
+              >
+                <Bot className="h-5 w-5 mr-2" />
+                Start Chatting
               </Button>
-            </RouterLink>
-            <RouterLink to="/chat">
-              <Button size="lg" variant="outline" className="text-lg px-8 hover:scale-105 transition-transform">
-                Try AI Assistant
-              </Button>
-            </RouterLink>
+            )}
           </div>
         </div>
       </section>
@@ -112,7 +157,8 @@ const Index = () => {
         </h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* AI Legal Assistant */}
-          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 border-emerald-100">
+          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 border-emerald-100 cursor-pointer"
+                onClick={() => handleProtectedNavigation('/chat')}>
             <CardContent className="p-6 text-center">
               <div className="bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Bot className="h-8 w-8 text-emerald-600" />
@@ -131,7 +177,8 @@ const Index = () => {
           </Card>
 
           {/* Blockchain Document Storage */}
-          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 border-amber-100">
+          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 border-amber-100 cursor-pointer"
+                onClick={() => handleProtectedNavigation('/documents')}>
             <CardContent className="p-6 text-center">
               <div className="bg-amber-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Shield className="h-8 w-8 text-amber-600" />
@@ -148,7 +195,8 @@ const Index = () => {
           </Card>
 
           {/* Find Lawyers */}
-          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 border-blue-100">
+          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 border-blue-100 cursor-pointer"
+                onClick={() => handleProtectedNavigation('/lawyers')}>
             <CardContent className="p-6 text-center">
               <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Users className="h-8 w-8 text-blue-600" />
@@ -164,7 +212,8 @@ const Index = () => {
           </Card>
 
           {/* Legal News */}
-          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 border-green-100">
+          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 border-green-100 cursor-pointer"
+                onClick={() => handleProtectedNavigation('/news')}>
             <CardContent className="p-6 text-center">
               <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Newspaper className="h-8 w-8 text-green-600" />
@@ -180,7 +229,8 @@ const Index = () => {
           </Card>
 
           {/* Chat History */}
-          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 border-purple-100">
+          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 border-purple-100 cursor-pointer"
+                onClick={() => handleProtectedNavigation('/chat')}>
             <CardContent className="p-6 text-center">
               <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <MessageCircle className="h-8 w-8 text-purple-600" />
@@ -196,7 +246,8 @@ const Index = () => {
           </Card>
 
           {/* Case Solutions */}
-          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 border-rose-100">
+          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 border-rose-100 cursor-pointer"
+                onClick={() => handleProtectedNavigation('/chat')}>
             <CardContent className="p-6 text-center">
               <div className="bg-rose-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <FileText className="h-8 w-8 text-rose-600" />
@@ -222,11 +273,21 @@ const Index = () => {
           <p className="text-xl mb-8 opacity-90">
             Join thousands of Pakistanis who trust Wakalat-GPT for their legal needs
           </p>
-          <RouterLink to="/signup">
-            <Button size="lg" className="bg-white text-emerald-600 hover:bg-gray-100 text-lg px-8 hover:scale-105 transition-transform">
-              Start Your Legal Journey
+          {!isLoggedIn ? (
+            <RouterLink to="/signup">
+              <Button size="lg" className="bg-white text-emerald-600 hover:bg-gray-100 text-lg px-8 hover:scale-105 transition-transform">
+                Start Your Legal Journey
+              </Button>
+            </RouterLink>
+          ) : (
+            <Button 
+              size="lg" 
+              className="bg-white text-emerald-600 hover:bg-gray-100 text-lg px-8 hover:scale-105 transition-transform"
+              onClick={() => handleProtectedNavigation('/chat')}
+            >
+              Continue Your Journey
             </Button>
-          </RouterLink>
+          )}
         </div>
       </section>
 

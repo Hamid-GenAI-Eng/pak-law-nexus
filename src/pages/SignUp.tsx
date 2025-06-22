@@ -55,7 +55,8 @@ const SignUp = () => {
         title: "Account Created Successfully!",
         description: `Welcome to Wakalat-GPT! Your ${formData.role === 'lawyer' ? 'lawyer' : 'local person'} account is ready.`,
       });
-      navigate('/chat');
+      // Redirect to home page after signup so user can access protected routes
+      navigate('/');
     }, 2000);
   };
 

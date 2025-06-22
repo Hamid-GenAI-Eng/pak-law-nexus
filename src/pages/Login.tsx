@@ -28,7 +28,8 @@ const Login = () => {
         title: "Login Successful!",
         description: `Welcome back! Logged in as ${role === 'lawyer' ? 'Lawyer' : 'Local Person'}`,
       });
-      navigate('/chat');
+      // Redirect to home page after login so user can access protected routes
+      navigate('/');
     }, 1500);
   };
 

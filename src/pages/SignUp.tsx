@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -55,8 +54,8 @@ const SignUp = () => {
         title: "Account Created Successfully!",
         description: `Welcome to Wakalat-GPT! Your ${formData.role === 'lawyer' ? 'lawyer' : 'local person'} account is ready.`,
       });
-      // Redirect to home page after signup so user can access protected routes
-      navigate('/');
+      // Redirect to chatbot page after signup
+      navigate('/chat');
     }, 2000);
   };
 

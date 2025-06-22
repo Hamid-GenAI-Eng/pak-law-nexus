@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,8 +27,8 @@ const Login = () => {
         title: "Login Successful!",
         description: `Welcome back! Logged in as ${role === 'lawyer' ? 'Lawyer' : 'Local Person'}`,
       });
-      // Redirect to home page after login so user can access protected routes
-      navigate('/');
+      // Redirect to chatbot page after login
+      navigate('/chat');
     }, 1500);
   };
 

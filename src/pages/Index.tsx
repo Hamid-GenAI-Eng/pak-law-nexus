@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -85,7 +84,7 @@ const Index = () => {
                   className="hover:bg-emerald-50"
                 >
                   <Users className="h-4 w-4 mr-2" />
-                  Find Lawyers
+                  Find Lawyer
                 </Button>
                 <Button 
                   variant="outline" 
@@ -93,7 +92,7 @@ const Index = () => {
                   className="hover:bg-emerald-50"
                 >
                   <Newspaper className="h-4 w-4 mr-2" />
-                  Legal News
+                  News
                 </Button>
                 <Button 
                   variant="outline" 

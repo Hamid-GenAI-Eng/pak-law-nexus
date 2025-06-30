@@ -14,6 +14,8 @@ const NavBar = ({ isLoggedIn, onLogout }: NavBarProps) => {
   const location = useLocation();
   const { toast } = useToast();
 
+  console.log("NavBar rendering - isLoggedIn:", isLoggedIn, "location:", location.pathname);
+
   const handleLogout = () => {
     onLogout();
     toast({
@@ -26,7 +28,16 @@ const NavBar = ({ isLoggedIn, onLogout }: NavBarProps) => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className="bg-white/95 backdrop-blur-md border-b border-emerald-100 sticky top-0 z-50 shadow-lg">
+    <nav 
+      className="bg-white/95 backdrop-blur-md border-b border-emerald-100 sticky top-0 z-50 shadow-lg min-h-[80px]"
+      style={{ 
+        position: 'sticky',
+        top: 0,
+        zIndex: 9999,
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderBottom: '1px solid #d1fae5'
+      }}
+    >
       <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
           {/* Logo */}

@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,6 +10,8 @@ const Index = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  console.log("Index page rendering - isLoggedIn:", isLoggedIn);
 
   const handleLogout = () => {
     setIsLoggedIn(false);
@@ -24,8 +27,10 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50">
-      {/* Navigation */}
-      <NavBar isLoggedIn={isLoggedIn} onLogout={handleLogout} />
+      {/* Navigation - Fixed at top */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 1000 }}>
+        <NavBar isLoggedIn={isLoggedIn} onLogout={handleLogout} />
+      </div>
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-16 text-center">

@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Shield, MessageCircle, FileText, Users, Newspaper, Scale, Link, Bot, Upload, Mic, LogOut, ArrowLeft } from "lucide-react";
+import { Shield, MessageCircle, FileText, Users, Newspaper, Scale, Link, Bot, Upload, Mic, ArrowLeft } from "lucide-react";
 import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
+import NavBar from "@/components/NavBar";
 
 const Index = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -11,11 +12,6 @@ const Index = () => {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    navigate('/');
-  };
-
-  const handleGoBack = () => {
-    navigate(-1);
   };
 
   const handleProtectedNavigation = (path: string) => {
@@ -29,84 +25,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50">
       {/* Navigation */}
-      <nav className="bg-white/90 backdrop-blur-md border-b border-emerald-100 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            {location.pathname !== '/' && (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={handleGoBack}
-                className="hover:bg-emerald-50"
-              >
-                <ArrowLeft className="h-4 w-4 mr-1" />
-                Back
-              </Button>
-            )}
-            <RouterLink to="/" className="flex items-center space-x-2">
-              <Scale className="h-8 w-8 text-emerald-600" />
-              <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-amber-600 bg-clip-text text-transparent">
-                Wakalat-GPT
-              </span>
-            </RouterLink>
-          </div>
-          <div className="flex space-x-4">
-            {!isLoggedIn ? (
-              <>
-                <RouterLink to="/login">
-                  <Button variant="outline" className="hover:bg-emerald-50">Login</Button>
-                </RouterLink>
-                <RouterLink to="/signup">
-                  <Button className="bg-emerald-600 hover:bg-emerald-700">Sign Up</Button>
-                </RouterLink>
-              </>
-            ) : (
-              <div className="flex space-x-4">
-                <Button 
-                  variant="outline" 
-                  onClick={() => handleProtectedNavigation('/chat')}
-                  className="hover:bg-emerald-50"
-                >
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  Chatbot
-                </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={() => handleProtectedNavigation('/documents')}
-                  className="hover:bg-emerald-50"
-                >
-                  <FileText className="h-4 w-4 mr-2" />
-                  Documents
-                </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={() => handleProtectedNavigation('/lawyers')}
-                  className="hover:bg-emerald-50"
-                >
-                  <Users className="h-4 w-4 mr-2" />
-                  Find Lawyer
-                </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={() => handleProtectedNavigation('/news')}
-                  className="hover:bg-emerald-50"
-                >
-                  <Newspaper className="h-4 w-4 mr-2" />
-                  News
-                </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={handleLogout}
-                  className="hover:bg-red-50 hover:text-red-600 hover:border-red-200"
-                >
-                  <LogOut className="h-4 w-4 mr-1" />
-                  Logout
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-      </nav>
+      <NavBar isLoggedIn={isLoggedIn} onLogout={handleLogout} />
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-16 text-center">

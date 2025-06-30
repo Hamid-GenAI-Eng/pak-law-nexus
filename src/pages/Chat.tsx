@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +7,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Bot, User, Mic, MicOff, Upload, Send, Clock, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+import NavBar from "@/components/NavBar";
 
 interface ChatMessage {
   id: string;
@@ -65,6 +66,11 @@ const Chat = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    navigate('/');
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -162,6 +168,9 @@ const Chat = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50">
+      {/* Navigation */}
+      <NavBar isLoggedIn={true} onLogout={handleLogout} />
+      
       <div className="container mx-auto px-4 py-6">
         <div className="grid lg:grid-cols-4 gap-6 h-[calc(100vh-6rem)]">
           

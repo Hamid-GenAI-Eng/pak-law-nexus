@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,8 +17,10 @@ import {
   Search,
   GraduationCap,
   Calendar,
-  MessageCircle
+  MessageCircle,
+  Plus
 } from "lucide-react";
+import LawyerRegistrationForm from "@/components/LawyerRegistrationForm";
 
 interface Lawyer {
   id: string;
@@ -134,6 +135,8 @@ const Lawyers = () => {
   const [rateRange, setRateRange] = useState([0, 10000]);
   const [minRating, setMinRating] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
+  const [showRegistrationForm, setShowRegistrationForm] = useState(false);
+  const [isLawyer, setIsLawyer] = useState(true); // In real app, this would come from auth context
 
   const locations = ['All Cities', 'Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad'];
   const specializations = [
@@ -175,14 +178,33 @@ const Lawyers = () => {
     ));
   };
 
+  const handleLawyerRegistration = (data: any) => {
+    console.log('Lawyer registration data:', data);
+    // In a real app, this would save to a database
+    setShowRegistrationForm(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50 py-6">
       <div className="container mx-auto px-4">
         
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Find Expert Lawyers</h1>
-          <p className="text-gray-600">Connect with qualified legal professionals across Pakistan</p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">Find Expert Lawyers</h1>
+              <p className="text-gray-600">Connect with qualified legal professionals across Pakistan</p>
+            </div>
+            {isLawyer && (
+              <Button 
+                onClick={() => setShowRegistrationForm(true)}
+                className="bg-emerald-600 hover:bg-emerald-700"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Register as Lawyer
+              </Button>
+            )}
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-4 gap-6">
@@ -445,6 +467,13 @@ const Lawyers = () => {
             </ScrollArea>
           </div>
         </div>
+
+        {/* Lawyer Registration Form */}
+        <LawyerRegistrationForm
+          isOpen={showRegistrationForm}
+          onClose={() => setShowRegistrationForm(false)}
+          onSubmit={handleLawyerRegistration}
+        />
       </div>
     </div>
   );

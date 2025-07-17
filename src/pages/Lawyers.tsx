@@ -20,7 +20,9 @@ import {
   MessageCircle,
   Plus
 } from "lucide-react";
+import NavBar from "@/components/NavBar";
 import LawyerRegistrationForm from "@/components/LawyerRegistrationForm";
+import LawyerChatSystem from "@/components/LawyerChatSystem";
 
 interface Lawyer {
   id: string;
@@ -41,6 +43,10 @@ interface Lawyer {
 }
 
 const Lawyers = () => {
+  const [isLoggedIn] = useState(true);
+  const [selectedLawyer, setSelectedLawyer] = useState<Lawyer | null>(null);
+  const [showChat, setShowChat] = useState(false);
+  
   const [lawyers] = useState<Lawyer[]>([
     {
       id: '1',
@@ -184,13 +190,19 @@ const Lawyers = () => {
     setShowRegistrationForm(false);
   };
 
+  const handleChatWithLawyer = (lawyer: Lawyer) => {
+    setSelectedLawyer(lawyer);
+    setShowChat(true);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50 py-6">
-      <div className="container mx-auto px-4">
-        
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50">
+      <NavBar isLoggedIn={isLoggedIn} onLogout={() => {}} />
+      
+      <div className="container mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center">
             <div>
               <h1 className="text-3xl font-bold text-gray-800 mb-2">Find Expert Lawyers</h1>
               <p className="text-gray-600">Connect with qualified legal professionals across Pakistan</p>
@@ -198,7 +210,7 @@ const Lawyers = () => {
             {isLawyer && (
               <Button 
                 onClick={() => setShowRegistrationForm(true)}
-                className="bg-emerald-600 hover:bg-emerald-700"
+                className="bg-emerald-600 hover:bg-emerald-700 mt-4 md:mt-0"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Register as Lawyer
@@ -424,9 +436,12 @@ const Lawyers = () => {
                               </div>
 
                               <div className="space-y-2">
-                                <Button className="w-full bg-emerald-600 hover:bg-emerald-700">
+                                <Button 
+                                  className="w-full bg-emerald-600 hover:bg-emerald-700"
+                                  onClick={() => handleChatWithLawyer(lawyer)}
+                                >
                                   <MessageCircle className="h-4 w-4 mr-2" />
-                                  Contact Now
+                                  Chat Now
                                 </Button>
                                 <Button variant="outline" className="w-full">
                                   View Profile
@@ -474,6 +489,15 @@ const Lawyers = () => {
           onClose={() => setShowRegistrationForm(false)}
           onSubmit={handleLawyerRegistration}
         />
+
+        {/* Lawyer Chat System */}
+        {selectedLawyer && (
+          <LawyerChatSystem
+            isOpen={showChat}
+            onClose={() => setShowChat(false)}
+            lawyer={selectedLawyer}
+          />
+        )}
       </div>
     </div>
   );

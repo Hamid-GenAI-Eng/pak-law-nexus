@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
   Newspaper, 
   Calendar, 
@@ -16,8 +17,13 @@ import {
   Building,
   Users,
   ExternalLink,
-  BookOpen
+  BookOpen,
+  MessageCircle,
+  Settings,
+  Bot
 } from "lucide-react";
+import NavBar from "@/components/NavBar";
+import NewsBot from "@/components/NewsBot";
 
 interface NewsArticle {
   id: string;
@@ -34,6 +40,17 @@ interface NewsArticle {
 }
 
 const News = () => {
+  const [isLoggedIn] = useState(true);
+  const [interests, setInterests] = useState<string[]>(['Constitutional Law', 'Corporate Law']);
+  const [showInterestSettings, setShowInterestSettings] = useState(false);
+  const [showNewsBot, setShowNewsBot] = useState(false);
+
+  const availableInterests = [
+    'Constitutional Law', 'Corporate Law', 'Family Law', 'Criminal Law',
+    'Property Law', 'Labour Law', 'Tax Law', 'Immigration Law',
+    'Business Law', 'Medical Law', 'Technology Law', 'Environmental Law'
+  ];
+
   const [newsArticles] = useState<NewsArticle[]>([
     {
       id: '1',
@@ -113,6 +130,14 @@ const News = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedSource, setSelectedSource] = useState('');
 
+  const handleInterestChange = (interest: string, checked: boolean) => {
+    if (checked) {
+      setInterests(prev => [...prev, interest]);
+    } else {
+      setInterests(prev => prev.filter(i => i !== interest));
+    }
+  };
+
   const categories = [
     'All Categories',
     'Constitutional Law',
@@ -179,13 +204,43 @@ const News = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50 py-6">
-      <div className="container mx-auto px-4">
-        
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50">
+      <NavBar isLoggedIn={isLoggedIn} onLogout={() => {}} />
+      
+      <div className="container mx-auto px-4 py-6">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Legal News & Updates</h1>
-          <p className="text-gray-600">Stay informed with the latest legal developments in Pakistan</p>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Legal News & Updates</h1>
+            <p className="text-gray-600">Stay informed with the latest legal developments in Pakistan</p>
+            {interests.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                <span className="text-sm text-gray-500">Your interests:</span>
+                {interests.map(interest => (
+                  <Badge key={interest} variant="outline" className="text-emerald-600 border-emerald-200">
+                    {interest}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="flex items-center space-x-3 mt-4 md:mt-0">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowInterestSettings(true)}
+              className="hover:bg-emerald-50"
+            >
+              <Settings className="h-4 w-4 mr-2" />
+              Set Interests
+            </Button>
+            <Button 
+              onClick={() => setShowNewsBot(true)}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
+              <Bot className="h-4 w-4 mr-2" />
+              News Assistant
+            </Button>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-4 gap-6">
@@ -411,6 +466,65 @@ const News = () => {
             </CardContent>
           </Card>
         )}
+
+        {/* Interest Settings Modal */}
+        {showInterestSettings && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <Card className="w-full max-w-md">
+              <CardHeader>
+                <CardTitle className="flex items-center text-emerald-700">
+                  <Settings className="h-5 w-5 mr-2" />
+                  Set Your Interests
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600 mb-4">
+                  Select legal areas you're interested in to get personalized news recommendations.
+                </p>
+                <div className="space-y-3 max-h-64 overflow-y-auto">
+                  {availableInterests.map(interest => (
+                    <div key={interest} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={interest}
+                        checked={interests.includes(interest)}
+                        onCheckedChange={(checked) => 
+                          handleInterestChange(interest, checked as boolean)
+                        }
+                      />
+                      <label 
+                        htmlFor={interest} 
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {interest}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-end space-x-2 mt-6">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowInterestSettings(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    onClick={() => setShowInterestSettings(false)}
+                    className="bg-emerald-600 hover:bg-emerald-700"
+                  >
+                    Save Interests
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* News Bot */}
+        <NewsBot 
+          isOpen={showNewsBot}
+          onClose={() => setShowNewsBot(false)}
+          interests={interests}
+        />
       </div>
     </div>
   );

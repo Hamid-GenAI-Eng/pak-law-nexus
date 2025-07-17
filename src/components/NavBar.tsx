@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Scale, MessageCircle, FileText, Users, Newspaper, LogOut } from "lucide-react";
+import { Scale, MessageCircle, FileText, Users, Newspaper, LogOut, Settings } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
@@ -105,6 +105,19 @@ const NavBar = ({ isLoggedIn, onLogout }: NavBarProps) => {
                     <Newspaper className="h-4 w-4 mr-2" />
                     News
                   </Button>
+                  
+                  <Button
+                    variant={isActive('/lawyer-dashboard') ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => navigate('/lawyer-dashboard')}
+                    className={`${isActive('/lawyer-dashboard') 
+                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
+                      : 'hover:bg-emerald-50 hover:text-emerald-700'
+                    } transition-all duration-200`}
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Dashboard
+                  </Button>
                 </div>
 
                 {/* Mobile Navigation Dropdown */}
@@ -118,6 +131,7 @@ const NavBar = ({ isLoggedIn, onLogout }: NavBarProps) => {
                     <option value="/documents">Documents</option>
                     <option value="/lawyers">Find Lawyer</option>
                     <option value="/news">News</option>
+                    <option value="/lawyer-dashboard">Dashboard</option>
                   </select>
                 </div>
 

@@ -7,18 +7,21 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Scale, User, Briefcase } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import AnimatedLogo from "@/components/AnimatedLogo";
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('local');
   const [isLoading, setIsLoading] = useState(false);
+  const [showLoginLogo, setShowLoginLogo] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setShowLoginLogo(true);
     
     // Simulate login process
     setTimeout(() => {
@@ -29,11 +32,17 @@ const Login = () => {
       });
       // Redirect to chatbot page after login
       navigate('/chat');
-    }, 1500);
+    }, 2000);
+  };
+
+  const handleLogoComplete = () => {
+    setShowLoginLogo(false);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50 flex items-center justify-center p-4">
+    <>
+      {showLoginLogo && <AnimatedLogo onComplete={handleLogoComplete} trigger={true} />}
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md animate-fade-in">
         {/* Logo */}
         <div className="text-center mb-8">
@@ -136,6 +145,7 @@ const Login = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -22,8 +22,11 @@ const App = () => {
   const [showLogo, setShowLogo] = useState(true);
 
   const handleLogoComplete = () => {
+    console.log('Logo animation completed in App');
     setShowLogo(false);
   };
+
+  console.log('App render:', { showLogo });
 
   return (
     <QueryClientProvider client={queryClient}>

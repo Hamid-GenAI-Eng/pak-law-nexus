@@ -1,8 +1,9 @@
-
 import { Button } from "@/components/ui/button";
-import { Scale, MessageCircle, FileText, Users, Newspaper, LogOut, Settings } from "lucide-react";
+import { Scale, MessageCircle, FileText, Users, Newspaper, LogOut, Settings, Menu } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 interface NavBarProps {
   isLoggedIn: boolean;
@@ -13,8 +14,7 @@ const NavBar = ({ isLoggedIn, onLogout }: NavBarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-
-  console.log("NavBar rendering - isLoggedIn:", isLoggedIn, "location:", location.pathname);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = () => {
     onLogout();
@@ -23,143 +23,150 @@ const NavBar = ({ isLoggedIn, onLogout }: NavBarProps) => {
       description: "You have been successfully logged out.",
     });
     navigate('/');
+    setIsOpen(false);
   };
 
   const isActive = (path: string) => location.pathname === path;
 
+  const navItems = [
+    { path: '/chat', label: 'AI Assistant', icon: MessageCircle },
+    { path: '/documents', label: 'Documents', icon: FileText },
+    { path: '/lawyers', label: 'Find Lawyers', icon: Users },
+    { path: '/news', label: 'Legal News', icon: Newspaper },
+    { path: '/lawyer-dashboard', label: 'Dashboard', icon: Settings }
+  ];
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    setIsOpen(false);
+  };
+
   return (
-    <nav 
-      className="bg-white/95 backdrop-blur-md border-b border-emerald-100 sticky top-0 z-50 shadow-lg min-h-[80px]"
-      style={{ 
-        position: 'sticky',
-        top: 0,
-        zIndex: 9999,
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        borderBottom: '1px solid #d1fae5'
-      }}
-    >
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex justify-between items-center">
+    <nav className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur-xl border-b border-border shadow-soft">
+      <div className="container-premium">
+        <div className="flex h-20 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 hover:scale-105 transition-transform">
-            <Scale className="h-8 w-8 text-emerald-600" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-amber-600 bg-clip-text text-transparent">
-              Wakalat-GPT
-            </span>
+          <Link to="/" className="flex items-center space-x-3 hover-lift">
+            <div className="relative">
+              <Scale className="h-10 w-10 text-primary" />
+              <div className="absolute inset-0 bg-primary/20 rounded-full blur-lg animate-pulse" />
+            </div>
+            <div>
+              <span className="text-2xl font-bold text-gradient-primary font-display">
+                Wukala-GPT
+              </span>
+              <div className="text-xs text-muted-foreground font-medium">
+                Legal AI Platform
+              </div>
+            </div>
           </Link>
 
-          {/* Navigation Links */}
-          <div className="flex items-center space-x-2">
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center space-x-1">
             {isLoggedIn ? (
               <>
-                {/* Main Navigation */}
-                <div className="hidden md:flex space-x-1">
+                {navItems.map((item) => (
                   <Button
-                    variant={isActive('/chat') ? "default" : "ghost"}
+                    key={item.path}
+                    variant={isActive(item.path) ? "default" : "ghost"}
                     size="sm"
-                    onClick={() => navigate('/chat')}
-                    className={`${isActive('/chat') 
-                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
-                      : 'hover:bg-emerald-50 hover:text-emerald-700'
-                    } transition-all duration-200`}
+                    onClick={() => navigate(item.path)}
+                    className={`${
+                      isActive(item.path) 
+                        ? 'bg-primary text-primary-foreground shadow-soft' 
+                        : 'hover:bg-primary/5 hover:text-primary'
+                    } transition-all duration-300 px-4 py-2 h-10`}
                   >
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    Chatbot
+                    <item.icon className="h-4 w-4 mr-2" />
+                    {item.label}
                   </Button>
-                  
-                  <Button
-                    variant={isActive('/documents') ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => navigate('/documents')}
-                    className={`${isActive('/documents') 
-                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
-                      : 'hover:bg-emerald-50 hover:text-emerald-700'
-                    } transition-all duration-200`}
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    Documents
-                  </Button>
-                  
-                  <Button
-                    variant={isActive('/lawyers') ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => navigate('/lawyers')}
-                    className={`${isActive('/lawyers') 
-                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
-                      : 'hover:bg-emerald-50 hover:text-emerald-700'
-                    } transition-all duration-200`}
-                  >
-                    <Users className="h-4 w-4 mr-2" />
-                    Find Lawyer
-                  </Button>
-                  
-                  <Button
-                    variant={isActive('/news') ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => navigate('/news')}
-                    className={`${isActive('/news') 
-                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
-                      : 'hover:bg-emerald-50 hover:text-emerald-700'
-                    } transition-all duration-200`}
-                  >
-                    <Newspaper className="h-4 w-4 mr-2" />
-                    News
-                  </Button>
-                  
-                  <Button
-                    variant={isActive('/lawyer-dashboard') ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => navigate('/lawyer-dashboard')}
-                    className={`${isActive('/lawyer-dashboard') 
-                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
-                      : 'hover:bg-emerald-50 hover:text-emerald-700'
-                    } transition-all duration-200`}
-                  >
-                    <Settings className="h-4 w-4 mr-2" />
-                    Dashboard
-                  </Button>
-                </div>
-
-                {/* Mobile Navigation Dropdown */}
-                <div className="md:hidden">
-                  <select 
-                    onChange={(e) => navigate(e.target.value)}
-                    value={location.pathname}
-                    className="px-3 py-2 border border-emerald-200 rounded-md text-sm focus:border-emerald-500 focus:outline-none"
-                  >
-                    <option value="/chat">Chatbot</option>
-                    <option value="/documents">Documents</option>
-                    <option value="/lawyers">Find Lawyer</option>
-                    <option value="/news">News</option>
-                    <option value="/lawyer-dashboard">Dashboard</option>
-                  </select>
-                </div>
-
-                {/* Logout Button */}
+                ))}
+                
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleLogout}
-                  className="hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all duration-200 ml-2"
+                  className="ml-4 hover:bg-destructive/5 hover:text-destructive hover:border-destructive/20 transition-all duration-300 h-10"
                 >
-                  <LogOut className="h-4 w-4 mr-1" />
-                  <span className="hidden sm:inline">Logout</span>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
                 </Button>
               </>
             ) : (
-              <>
+              <div className="flex items-center space-x-3">
                 <Link to="/login">
-                  <Button variant="outline" size="sm" className="hover:bg-emerald-50">
-                    Login
+                  <Button variant="ghost" size="sm" className="hover:bg-primary/5 hover:text-primary h-10">
+                    Sign In
                   </Button>
                 </Link>
                 <Link to="/signup">
-                  <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700">
-                    Sign Up
+                  <Button size="sm" className="btn-premium bg-gradient-primary hover:shadow-premium h-10 px-6">
+                    Get Started
                   </Button>
                 </Link>
-              </>
+              </div>
             )}
+          </div>
+
+          {/* Mobile Navigation */}
+          <div className="lg:hidden">
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-10 w-10 p-0">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-80 bg-card/95 backdrop-blur-xl">
+                <div className="flex flex-col space-y-4 mt-8">
+                  {isLoggedIn ? (
+                    <>
+                      {navItems.map((item) => (
+                        <Button
+                          key={item.path}
+                          variant={isActive(item.path) ? "default" : "ghost"}
+                          className={`justify-start h-12 ${
+                            isActive(item.path) 
+                              ? 'bg-primary text-primary-foreground' 
+                              : 'hover:bg-primary/5 hover:text-primary'
+                          }`}
+                          onClick={() => handleNavigation(item.path)}
+                        >
+                          <item.icon className="h-5 w-5 mr-3" />
+                          {item.label}
+                        </Button>
+                      ))}
+                      
+                      <div className="border-t border-border my-4" />
+                      
+                      <Button
+                        variant="outline"
+                        className="justify-start h-12 hover:bg-destructive/5 hover:text-destructive"
+                        onClick={handleLogout}
+                      >
+                        <LogOut className="h-5 w-5 mr-3" />
+                        Sign Out
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        variant="ghost"
+                        className="justify-start h-12 hover:bg-primary/5 hover:text-primary"
+                        onClick={() => handleNavigation('/login')}
+                      >
+                        Sign In
+                      </Button>
+                      <Button
+                        className="justify-start h-12 btn-premium bg-gradient-primary"
+                        onClick={() => handleNavigation('/signup')}
+                      >
+                        Get Started
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </div>

@@ -1,22 +1,25 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Bot, User, Mic, MicOff, Upload, Send, Clock, FileText } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Send, Mic, Paperclip, Bot, User, MessageCircle, Plus, Clock, FileText, Search, Sparkles, Brain, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
 import NavBar from "@/components/NavBar";
+import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 
 interface ChatMessage {
   id: string;
-  type: 'user' | 'bot';
-  message: string;
+  content: string;
+  sender: 'user' | 'ai';
   timestamp: Date;
-  hasFile?: boolean;
+  type?: 'text' | 'file';
   fileName?: string;
+  fileSize?: string;
+  isTyping?: boolean;
 }
 
 interface ChatHistory {
@@ -25,317 +28,372 @@ interface ChatHistory {
   lastMessage: string;
   timestamp: Date;
   messageCount: number;
+  category: 'legal' | 'document' | 'general';
 }
 
 const Chat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
-      type: 'bot',
-      message: 'السلام علیکم! میں Wakalat-GPT ہوں، آپ کا AI قانونی مشیر۔ آپ کو کسی قانونی مسئلے میں کیسے مدد کر سکتا ہوں؟',
-      timestamp: new Date()
+      content: "Hello! I'm your AI legal assistant trained on Pakistani law. How can I help you today?",
+      sender: 'ai',
+      timestamp: new Date(),
     }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [chatHistory, setChatHistory] = useState<ChatHistory[]>([
-    {
-      id: '1',
-      title: 'Property Dispute Inquiry',
-      lastMessage: 'Thank you for the advice on property law...',
-      timestamp: new Date(Date.now() - 86400000), // 1 day ago
-      messageCount: 12
-    },
-    {
-      id: '2',
-      title: 'Family Law Consultation',
-      lastMessage: 'I need help with divorce proceedings...',
-      timestamp: new Date(Date.now() - 172800000), // 2 days ago
-      messageCount: 8
-    },
-    {
-      id: '3',
-      title: 'Criminal Law Question',
-      lastMessage: 'What are the procedures for bail...',
-      timestamp: new Date(Date.now() - 259200000), // 3 days ago
-      messageCount: 15
-    }
-  ]);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [selectedChatId, setSelectedChatId] = useState('current');
+  const [searchHistory, setSearchHistory] = useState('');
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-  const navigate = useNavigate();
+
+  const chatHistory: ChatHistory[] = [
+    {
+      id: 'current',
+      title: 'Legal Consultation - Current',
+      lastMessage: 'How can I help you today?',
+      timestamp: new Date(),
+      messageCount: 1,
+      category: 'legal'
+    },
+    {
+      id: '1',
+      title: 'Contract Review - Service Agreement',
+      lastMessage: 'The contract appears to be legally sound...',
+      timestamp: new Date(Date.now() - 86400000),
+      messageCount: 12,
+      category: 'document'
+    },
+    {
+      id: '2', 
+      title: 'Property Law Inquiry',
+      lastMessage: 'Property transfer procedures in Karachi...',
+      timestamp: new Date(Date.now() - 172800000),
+      messageCount: 8,
+      category: 'legal'
+    }
+  ];
+
+  const quickSuggestions = [
+    { text: "Review this contract", icon: FileText, category: "Document" },
+    { text: "Property law guidance", icon: Brain, category: "Legal" },
+    { text: "Employment rights", icon: Zap, category: "Rights" },
+    { text: "Business incorporation", icon: Sparkles, category: "Business" }
+  ];
 
   const handleLogout = () => {
-    navigate('/');
+    setIsLoggedIn(false);
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    scrollToBottom();
   }, [messages]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
-    const userMessage: ChatMessage = {
+    const newMessage: ChatMessage = {
       id: Date.now().toString(),
-      type: 'user',
-      message: inputMessage,
-      timestamp: new Date()
+      content: inputMessage,
+      sender: 'user',
+      timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages(prev => [...prev, newMessage]);
     setInputMessage('');
     setIsLoading(true);
 
+    // Simulate AI typing
+    const typingMessage: ChatMessage = {
+      id: 'typing',
+      content: '',
+      sender: 'ai',
+      timestamp: new Date(),
+      isTyping: true
+    };
+    setMessages(prev => [...prev, typingMessage]);
+
     // Simulate AI response
     setTimeout(() => {
-      const botResponse: ChatMessage = {
+      const aiResponse: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        type: 'bot',
-        message: 'آپ کے سوال کے مطابق، پاکستانی قانون کے تحت یہ معاملہ... (This is a simulated response. In a real implementation, this would connect to an AI service trained on Pakistani law)',
-        timestamp: new Date()
+        content: "Based on Pakistani law, I can provide you with detailed guidance on this matter. The relevant sections include constitutional provisions and recent case law developments.",
+        sender: 'ai',
+        timestamp: new Date(),
       };
-      setMessages(prev => [...prev, botResponse]);
+
+      setMessages(prev => prev.filter(msg => msg.id !== 'typing').concat(aiResponse));
       setIsLoading(false);
     }, 2000);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (file) {
-      const userMessage: ChatMessage = {
+      const fileMessage: ChatMessage = {
         id: Date.now().toString(),
-        type: 'user',
-        message: `Uploaded file: ${file.name}`,
+        content: `Uploaded: ${file.name}`,
+        sender: 'user',
         timestamp: new Date(),
-        hasFile: true,
-        fileName: file.name
+        type: 'file',
+        fileName: file.name,
+        fileSize: (file.size / 1024).toFixed(1) + ' KB'
       };
       
-      setMessages(prev => [...prev, userMessage]);
+      setMessages(prev => [...prev, fileMessage]);
       toast({
         title: "File Uploaded",
-        description: `${file.name} has been uploaded and is being analyzed.`,
+        description: `${file.name} has been uploaded for analysis.`,
       });
     }
   };
 
   const toggleRecording = () => {
-    if (!isRecording) {
-      setIsRecording(true);
-      toast({
-        title: "Recording Started",
-        description: "Speak your legal question...",
-      });
-      
-      // Simulate recording for 3 seconds
-      setTimeout(() => {
-        setIsRecording(false);
-        const recordedMessage: ChatMessage = {
-          id: Date.now().toString(),
-          type: 'user',
-          message: '🎤 Voice message: "I need help with a property dispute..."',
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, recordedMessage]);
-        toast({
-          title: "Recording Complete",
-          description: "Voice message has been processed.",
-        });
-      }, 3000);
-    } else {
-      setIsRecording(false);
-    }
-  };
-
-  const loadChatHistory = (historyId: string) => {
-    // Simulate loading chat history
+    setIsRecording(!isRecording);
     toast({
-      title: "Loading Chat History",
-      description: "Previous conversation loaded successfully.",
+      title: "Voice Recording",
+      description: isRecording ? "Recording stopped" : "Recording started",
     });
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50">
-      {/* Navigation */}
-      <NavBar isLoggedIn={true} onLogout={handleLogout} />
-      
-      <div className="container mx-auto px-4 py-6">
-        <div className="grid lg:grid-cols-4 gap-6 h-[calc(100vh-6rem)]">
-          
-          {/* Chat History Sidebar */}
-          <Card className="lg:col-span-1 border-emerald-100">
-            <CardHeader>
-              <CardTitle className="flex items-center text-emerald-700">
-                <Clock className="h-5 w-5 mr-2" />
-                Chat History
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              <ScrollArea className="h-[calc(100vh-12rem)]">
-                <div className="p-4 space-y-3">
-                  {chatHistory.map((chat) => (
-                    <div
-                      key={chat.id}
-                      onClick={() => loadChatHistory(chat.id)}
-                      className="p-3 rounded-lg border border-gray-200 hover:border-emerald-300 cursor-pointer hover:bg-emerald-50 transition-all duration-200"
-                    >
-                      <h4 className="font-medium text-sm text-gray-800 truncate">
-                        {chat.title}
-                      </h4>
-                      <p className="text-xs text-gray-600 mt-1 truncate">
-                        {chat.lastMessage}
-                      </p>
-                      <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
-                        <span>{chat.messageCount} messages</span>
-                        <span>{chat.timestamp.toLocaleDateString()}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
+  const formatTime = (date: Date) => {
+    return date.toLocaleDateString() === new Date().toLocaleDateString() 
+      ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      : date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  };
 
-          {/* Main Chat Interface */}
-          <Card className="lg:col-span-3 flex flex-col border-emerald-100">
-            <CardHeader className="bg-gradient-to-r from-emerald-600 to-amber-600 text-white rounded-t-lg">
-              <CardTitle className="flex items-center">
-                <Bot className="h-6 w-6 mr-2" />
-                Wakalat-GPT Legal Assistant
-              </CardTitle>
-              <p className="text-emerald-100 text-sm">
-                AI-powered legal advice for Pakistani law
-              </p>
-            </CardHeader>
+  return (
+    <div className="h-screen flex flex-col bg-gradient-surface">
+      <NavBar isLoggedIn={isLoggedIn} onLogout={handleLogout} />
+      
+      <div className="flex-1 flex overflow-hidden">
+        {/* Chat History Sidebar */}
+        <div className="w-80 bg-card border-r border-border flex flex-col">
+          <div className="p-6 border-b border-border bg-card-elevated">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground">Chat History</h2>
+              <Button size="sm" className="bg-primary/10 hover:bg-primary/20 text-primary border-0">
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
             
-            {/* Messages Area */}
-            <CardContent className="flex-1 p-0">
-              <ScrollArea className="h-[calc(100vh-20rem)] p-4">
-                <div className="space-y-4">
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}
-                    >
-                      <div className={`flex max-w-[80%] ${message.type === 'user' ? 'flex-row-reverse' : 'flex-row'} items-start space-x-2`}>
-                        <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                          message.type === 'user' 
-                            ? 'bg-emerald-600 text-white ml-2' 
-                            : 'bg-amber-100 text-amber-600 mr-2'
-                        }`}>
-                          {message.type === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
-                        </div>
-                        <div className={`rounded-lg px-4 py-3 ${
-                          message.type === 'user'
-                            ? 'bg-emerald-600 text-white'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {message.hasFile && (
-                            <div className="flex items-center mb-2 text-sm opacity-80">
-                              <FileText className="h-4 w-4 mr-1" />
-                              {message.fileName}
-                            </div>
-                          )}
-                          <p className="text-sm leading-relaxed">{message.message}</p>
-                          <p className={`text-xs mt-2 ${
-                            message.type === 'user' ? 'text-emerald-200' : 'text-gray-500'
-                          }`}>
-                            {message.timestamp.toLocaleTimeString()}
-                          </p>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search conversations..."
+                value={searchHistory}
+                onChange={(e) => setSearchHistory(e.target.value)}
+                className="pl-10 bg-background/50 border-border/50"
+              />
+            </div>
+          </div>
+
+          <ScrollArea className="flex-1">
+            <div className="p-4 space-y-2">
+              {chatHistory.map((chat) => (
+                <Card
+                  key={chat.id}
+                  className={`cursor-pointer transition-all duration-200 hover:shadow-soft ${
+                    selectedChatId === chat.id ? 'ring-2 ring-primary/20 bg-primary/5' : 'hover:bg-card-elevated'
+                  }`}
+                  onClick={() => setSelectedChatId(chat.id)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                        <Brain className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-sm text-foreground truncate">{chat.title}</h3>
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{chat.lastMessage}</p>
+                        <div className="flex items-center justify-between mt-2">
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {formatTime(chat.timestamp)}
+                          </span>
+                          <Badge variant="secondary" className="text-xs">
+                            {chat.messageCount}
+                          </Badge>
                         </div>
                       </div>
                     </div>
-                  ))}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
+
+        {/* Main Chat Area */}
+        <div className="flex-1 flex flex-col">
+          <div className="bg-card-elevated border-b border-border p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-12 w-12 border-2 border-primary/20">
+                  <AvatarFallback className="bg-gradient-primary text-white font-semibold">
+                    AI
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h1 className="text-xl font-semibold text-foreground">Legal AI Assistant</h1>
+                  <p className="text-sm text-muted-foreground">Specialized in Pakistani Law • Always Online</p>
+                </div>
+              </div>
+              
+              <Badge className="bg-success/10 text-success border-success/20">
+                <Sparkles className="h-3 w-3 mr-1" />
+                Pro Mode
+              </Badge>
+            </div>
+          </div>
+
+          <ScrollArea className="flex-1 p-6">
+            <div className="space-y-6 max-w-4xl mx-auto">
+              {messages.map((message) => (
+                <div key={message.id} className={`flex gap-4 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  {message.sender === 'ai' && (
+                    <Avatar className="h-10 w-10 border border-border">
+                      <AvatarFallback className="bg-gradient-primary text-white">
+                        <Bot className="h-5 w-5" />
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
                   
-                  {isLoading && (
-                    <div className="flex justify-start animate-fade-in">
-                      <div className="flex items-start space-x-2">
-                        <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">
-                          <Bot className="h-4 w-4" />
-                        </div>
-                        <div className="bg-gray-100 rounded-lg px-4 py-3">
-                          <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  <div className={`max-w-[70%] ${message.sender === 'user' ? 'order-first' : ''}`}>
+                    <Card className={`${
+                      message.sender === 'user' 
+                        ? 'bg-gradient-primary text-white border-primary/20' 
+                        : 'bg-card border-border'
+                    }`}>
+                      <CardContent className="p-4">
+                        {message.isTyping ? (
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <div className="flex gap-1">
+                              <div className="w-2 h-2 bg-current rounded-full animate-bounce" />
+                              <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                              <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                            </div>
+                            <span className="text-sm">AI is typing...</span>
                           </div>
-                        </div>
-                      </div>
-                    </div>
+                        ) : (
+                          <p className="leading-relaxed">{message.content}</p>
+                        )}
+                      </CardContent>
+                    </Card>
+                    <p className={`text-xs text-muted-foreground mt-2 ${message.sender === 'user' ? 'text-right' : 'text-left'}`}>
+                      {formatTime(message.timestamp)}
+                    </p>
+                  </div>
+
+                  {message.sender === 'user' && (
+                    <Avatar className="h-10 w-10 border border-border">
+                      <AvatarFallback className="bg-secondary/10 text-secondary">
+                        <User className="h-5 w-5" />
+                      </AvatarFallback>
+                    </Avatar>
                   )}
                 </div>
-                <div ref={messagesEndRef} />
-              </ScrollArea>
-            </CardContent>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+          </ScrollArea>
 
-            {/* Input Area */}
-            <div className="p-4 border-t border-gray-200 bg-white rounded-b-lg">
-              <div className="flex space-x-2">
+          {/* Quick Suggestions */}
+          {messages.length === 1 && (
+            <div className="px-6 py-4 border-t border-border bg-card-elevated">
+              <div className="max-w-4xl mx-auto">
+                <p className="text-sm text-muted-foreground mb-3">Quick suggestions to get started:</p>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                  {quickSuggestions.map((suggestion, index) => (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      size="sm"
+                      className="h-auto p-3 justify-start hover:bg-primary/5 hover:border-primary/20"
+                      onClick={() => setInputMessage(suggestion.text)}
+                    >
+                      <suggestion.icon className="h-4 w-4 mr-2 text-primary" />
+                      <div className="text-left">
+                        <div className="text-xs text-muted-foreground">{suggestion.category}</div>
+                        <div className="font-medium">{suggestion.text}</div>
+                      </div>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Input Area */}
+          <div className="bg-card border-t border-border p-6">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex gap-3 items-end">
                 <div className="flex-1">
                   <Textarea
-                    placeholder="اپنا قانونی سوال یہاں لکھیں... / Type your legal question here..."
+                    placeholder="Ask me anything about Pakistani law..."
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    className="min-h-[60px] resize-none border-emerald-200 focus:border-emerald-500"
-                    disabled={isLoading}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendMessage();
+                      }
+                    }}
+                    className="min-h-[50px] max-h-32 resize-none bg-background border-border/50 focus:border-primary/50"
+                    rows={1}
                   />
                 </div>
-                <div className="flex flex-col space-y-2">
+                
+                <div className="flex gap-2">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    accept=".pdf,.doc,.docx,.txt"
+                  />
+                  
                   <Button
-                    onClick={toggleRecording}
-                    variant={isRecording ? "destructive" : "outline"}
+                    variant="outline"
                     size="sm"
-                    className={`transition-all duration-200 ${isRecording ? 'animate-pulse' : ''}`}
+                    onClick={() => fileInputRef.current?.click()}
+                    className="h-12 w-12 p-0 hover:bg-secondary/10 hover:border-secondary/20"
                   >
-                    {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                    <Paperclip className="h-5 w-5 text-secondary" />
                   </Button>
                   
                   <Button
-                    onClick={() => fileInputRef.current?.click()}
                     variant="outline"
                     size="sm"
+                    onClick={toggleRecording}
+                    className={`h-12 w-12 p-0 ${
+                      isRecording 
+                        ? 'bg-destructive/10 border-destructive/20 text-destructive' 
+                        : 'hover:bg-accent/10 hover:border-accent/20'
+                    }`}
                   >
-                    <Upload className="h-4 w-4" />
+                    <Mic className="h-5 w-5" />
                   </Button>
                   
                   <Button
                     onClick={handleSendMessage}
-                    className="bg-emerald-600 hover:bg-emerald-700"
-                    size="sm"
                     disabled={!inputMessage.trim() || isLoading}
+                    className="h-12 w-12 p-0 btn-premium bg-gradient-primary hover:shadow-premium"
                   >
-                    <Send className="h-4 w-4" />
+                    <Send className="h-5 w-5" />
                   </Button>
                 </div>
               </div>
-              
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".pdf,.doc,.docx,.txt,.jpg,.png"
-                onChange={handleFileUpload}
-                className="hidden"
-              />
-              
-              <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
-                <span>Supports: PDF, DOC, TXT, Images</span>
-                <span>Press Enter to send, Shift+Enter for new line</span>
-              </div>
             </div>
-          </Card>
+          </div>
         </div>
       </div>
     </div>

@@ -10,18 +10,10 @@ const AnimatedLogo = ({ onComplete, trigger = false }: AnimatedLogoProps) => {
   const [hasPlayed, setHasPlayed] = useState(false);
 
   useEffect(() => {
-    console.log('AnimatedLogo useEffect triggered', { trigger });
-    
-    // For now, let's always show the animation to debug
     // Check if animation has already played this session
     const hasPlayedThisSession = localStorage.getItem('wukala-logo-played') === 'true';
-    console.log('hasPlayedThisSession:', hasPlayedThisSession);
-    
-    // Clear localStorage for testing - remove this later
-    localStorage.removeItem('wukala-logo-played');
     
     if (!hasPlayedThisSession || trigger) {
-      console.log('Setting visible to true');
       setIsVisible(true);
       setHasPlayed(false);
       
@@ -32,25 +24,20 @@ const AnimatedLogo = ({ onComplete, trigger = false }: AnimatedLogoProps) => {
       
       // Complete animation after 2 seconds
       const timer = setTimeout(() => {
-        console.log('Animation complete, fading out');
         setIsVisible(false);
         setHasPlayed(true);
         onComplete?.();
       }, 2000);
-
+      
       return () => clearTimeout(timer);
     } else {
       // If already played, immediately show main content
-      console.log('Animation already played, showing main content');
       setHasPlayed(true);
       onComplete?.();
     }
   }, [trigger, onComplete]);
 
-  console.log('AnimatedLogo render:', { isVisible, hasPlayed });
-  
   if (hasPlayed && !isVisible) {
-    console.log('Component returning null');
     return null;
   }
 
